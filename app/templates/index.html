@@ -1,0 +1,30 @@
+{% import 'bootstrap/wtf.html' as wtf %}
+{% extends 'base.html' %}
+
+{% block app_content %}
+  <div class="container">
+    <main>
+      <div class="row">
+        <div class="col-md-4 offset-md-4">
+
+          <!-- displays error messages for validators -->
+          {% for fieldName, errorMessages in form.errors.items() %}
+            {% for error in errorMessages %}
+              <p class="error">{{ fieldName.title() }}: {{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+
+          {{ wtf.quick_form(form) }}
+
+        </div> <!-- ends col 4 -->
+      </div> <!-- ends row -->
+      <div class="row">
+        <div class="col-md-4 offset-md-4">
+
+          <img src="{{image.image}}" />
+
+        </div> <!-- ends col 4 -->
+      </div> <!-- ends row -->
+    </main>
+  </div> <!-- ends container -->
+{% endblock %}
