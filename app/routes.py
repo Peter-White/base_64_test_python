@@ -90,7 +90,7 @@ def setImage():
     db.session.add(image)
     db.session.commit()
 
-    return jsonify({ "image" : str })
+    return jsonify({ "image" : image.image.decode("utf-8") })
 
 @app.route('/api/upload', methods=['POST'])
 def fileUpload():
