@@ -65,17 +65,32 @@ def getImage():
 
 @app.route('/api/post', methods=['POST', 'GET'])
 def setImage():
-    image = request.headers.get('image')
+    image = PlaceHolderImage.query.get(1)
 
-    print(request.files)
+    image.image = image.image.decode("utf-8")
 
-    # data = PlaceHolderImage.query.get(1)
-    # data.image = image
-    #
-    # db.session.add(data)
-    # db.session.commit()
+    target=os.path.join(app.instance_path, 'uploads')
+    if not os.path.isdir(target):
+        os.mkdir(target)
 
-    return jsonify({ "image" : image })
+    filename = request.form['filename']
+    file = request.files['file']
+
+    filename = secure_filename(filename)
+
+    str = base64.b64encode(file.read())
+
+    if(image):
+        image.image = str
+    else:
+        image = PlaceHolderImage(
+            image = str
+        )
+
+    db.session.add(image)
+    db.session.commit()
+
+    return jsonify({ "image" : str })
 
 @app.route('/api/upload', methods=['POST'])
 def fileUpload():
