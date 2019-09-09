@@ -2,10 +2,10 @@
 # also import necessary flask method
 from app import app, db
 from flask import render_template, url_for, redirect, flash, json, jsonify, request, session
-from app.forms import ImageForm
-from app.models import PlaceHolderImage
 from flask_uploads import UploadSet, configure_uploads, IMAGES, patch_request_class
 from werkzeug.utils import secure_filename
+from app.models import PlaceHolderImage
+from app.forms import ImageForm
 import requests
 import base64
 import os
@@ -69,50 +69,20 @@ def setImage():
 
     image.image = image.image.decode("utf-8")
 
-    target=os.path.join(app.instance_path, 'uploads')
-    if not os.path.isdir(target):
-        os.mkdir(target)
-
     filename = request.form['filename']
+    filetype = request.form['filetype']
     file = request.files['file']
 
-    path = os.path.join(
-        app.instance_path, 'uploads', filename
-    )
-
-    file.save(path)
-
-    str = ""
-    with open(path, "rb") as imageFile:
-        str = base64.b64encode(imageFile.read())
+    imageSTR = base64.b64encode(file.read())
 
     if(image):
-        image.image = str
+        image.image = imageSTR
     else:
         image = PlaceHolderImage(
-            image = str
+            image = imageSTR
         )
-
 
     db.session.add(image)
     db.session.commit()
 
     return jsonify({ "image" : image.image.decode("utf-8") })
-
-@app.route('/api/upload', methods=['POST'])
-def fileUpload():
-
-    target=os.path.join(app.instance_path, 'uploads')
-    if not os.path.isdir(target):
-        os.mkdir(target)
-
-    filename = request.form['filename']
-    file = request.files['file']
-
-    filename = secure_filename(filename)
-
-    destination="/".join([target, filename])
-    file.save(destination)
-    session['uploadFilePath']=destination
-    response="Whatever you wish too return"
-    return response
