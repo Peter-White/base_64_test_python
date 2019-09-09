@@ -76,9 +76,15 @@ def setImage():
     filename = request.form['filename']
     file = request.files['file']
 
-    filename = secure_filename(filename)
+    path = os.path.join(
+        app.instance_path, 'uploads', filename
+    )
 
-    str = base64.b64encode(file.read())
+    file.save(path)
+
+    str = ""
+    with open(path, "rb") as imageFile:
+        str = base64.b64encode(imageFile.read())
 
     if(image):
         image.image = str
@@ -86,6 +92,7 @@ def setImage():
         image = PlaceHolderImage(
             image = str
         )
+
 
     db.session.add(image)
     db.session.commit()
